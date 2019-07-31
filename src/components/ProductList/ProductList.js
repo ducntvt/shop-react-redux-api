@@ -2,6 +2,7 @@ import React, { Component } from "react";
 
 class ProductList extends Component {
     render() {
+        console.log('this.props.children :', this.props.children);
         return (
             <div className="panel panel-primary">
                 <div className="panel-heading">
@@ -20,7 +21,7 @@ class ProductList extends Component {
                             </tr>
                         </thead>
                         <tbody>
-                            {this.props.children}
+                            { this.props.children }
                         </tbody>
                     </table>
                 </div>

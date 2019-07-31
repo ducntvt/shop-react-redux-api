@@ -1,6 +1,13 @@
 import * as Types from './../constants/ActionTypes';
 import CallAPI from "./../utils/ApiCaller";
 
+export const actUpdateNavState = (navState) => {
+    return {
+        type: Types.UPDATE_NAV_STATE,
+        navState
+    }
+}
+
 export const actFetchProductRequest = () => {
     return (dispatch) => {
         return CallAPI('products', 'GET', null).then((res) => {

@@ -2,35 +2,51 @@ import React, { Component } from "react";
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { actAddProductRequest, actUpdateProductRequest, actGetProductRequest } from './../../actions/index';
+import { Form, Input, Button, Row, Col, Typography, Checkbox, InputNumber } from 'antd';
+const { Title } = Typography;
+
+
+
 
 class ProductActivePage extends Component {
-    constructor (props) {
-        super(props);
-        this.state = {
-            id: '',
-            txtName: '',
-            txtPrice: '',
-            chkbStatus: false
-        }
-    }
+    // constructor (props) {
+    //     super(props);
+    //     this.state = {
+    //         id: '',
+    //         txtName: '',
+    //         txtPrice: '',
+    //         chkbStatus: false
+    //     }
+    // }
+
+
+
+    // componentWillReceiveProps(nextProps) {
+    //     console.log('nextProps :', nextProps);
+    //     if (nextProps && nextProps.itemEditing) {
+    //         var { itemEditing } = nextProps;
+    //         this.setState({
+    //             id: itemEditing.id,
+    //             txtName: itemEditing.name,
+    //             txtPrice: itemEditing.price,
+    //             chkbStatus: itemEditing.status
+    //         })
+    //     }
+    // }
 
     componentDidMount() {
+        console.log('componentDidMount :');
         var { match } = this.props;
         if (match) {
             var id = match.params.id;
             this.props.editProduct(id);
         }
     }
-    componentWillReceiveProps(nextProps) {
-        if (nextProps && nextProps.itemEditing) {
-            var { itemEditing } = nextProps;
-            this.setState({
-                id: itemEditing.id,
-                txtName: itemEditing.name,
-                txtPrice: itemEditing.price,
-                chkbStatus: itemEditing.status
-            })
-        }
+
+    componentDidUpdate(prevProps) {
+        console.log('componentDidUpdate :');
+        console.log('prevProps :', prevProps);
+        console.log('form :', this.props);
     }
 
     onChange = (e) => {
@@ -39,7 +55,7 @@ class ProductActivePage extends Component {
         var value = target.type === 'checkbox' ? target.checked : target.value;
         console.log('value :', value);
         this.setState({
-            [name]: value
+            [ name ]: value
         })
     }
 
@@ -62,52 +78,109 @@ class ProductActivePage extends Component {
         }
     }
 
+    state = {
+        confirmDirty: false,
+    };
+
+    handleSubmit = e => {
+        e.preventDefault();
+        this.props.form.validateFieldsAndScroll((err, values) => {
+            if (!err) {
+                console.log('Received values of form: ', values);
+            }
+        });
+    };
+
+    handleConfirmBlur = e => {
+        const { value } = e.target;
+        this.setState({ confirmDirty: this.state.confirmDirty || !!value });
+    };
+
+    validateToPrice = (rule, value, callback) => {
+        var reg = /^\d+$/;
+        if (reg.test(value) && value <= 0) {
+            callback('Product price is must number and greater than zero!');
+        } else {
+            callback();
+        }
+    };
+
     render() {
-        var { txtName, txtPrice, chkbStatus } = this.state;
+        const { getFieldDecorator } = this.props.form;
+        const formItemLayout = {
+            labelCol: {
+                xs: { span: 24 },
+                sm: { span: 8 },
+            },
+            wrapperCol: {
+                xs: { span: 24 },
+                sm: { span: 16 },
+            },
+        };
+        const tailFormItemLayout = {
+            wrapperCol: {
+                xs: {
+                    span: 24,
+                    offset: 0,
+                },
+                sm: {
+                    span: 16,
+                    offset: 8,
+                },
+            },
+        };
+
         return (
-            <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                <form onSubmit={this.onSave}>
-                    <div className="form-group">
-                        <label>Name</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            name="txtName"
-                            onChange={this.onChange}
-                            value={txtName}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Price</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            name="txtPrice"
-                            onChange={this.onChange}
-                            value={txtPrice}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Status</label>
-                    </div>
-                    <div className="checkbox">
-                        <label>
-                            <input
-                                type="checkbox"
-                                name="chkbStatus"
-                                onChange={this.onChange}
-                                checked={chkbStatus}
-                            />
-                            Available
-                        </label>
-                    </div>
-                    <Link to="/product-list" className="btn btn-danger margin-right">Go Back</Link>
-                    <button type="submit" className="btn btn-primary">Save</button>
-                </form>
+            <div>
+                <Row type="flex" justify="center">
+                    <Col span={ 12 }>
+                        <Title>Add Product</Title>
+                        <Form layout="horizontal" onSubmit={ this.handleSubmit } { ...formItemLayout } >
+                            <Form.Item label="Product Name">
+                                { getFieldDecorator('txtName', {
+                                    rules: [
+                                        {
+                                            required: true,
+                                            message: 'Please input product name!',
+                                        },
+                                    ],
+                                })(<Input />) }
+                            </Form.Item>
+                            <Form.Item label="Product Price">
+                                { getFieldDecorator('txtPrice', {
+                                    rules: [
+                                        {
+                                            required: true,
+                                            message: 'Please input product price!'
+                                        },
+                                        {
+                                            validator: this.validateToPrice,
+                                        }
+                                    ],
+                                })(<InputNumber />) }
+                            </Form.Item>
+                            <Form.Item label="Status">
+                                { getFieldDecorator('chkbStatus', {
+                                    valuePropName: 'checked',
+                                })(
+                                    <Checkbox></Checkbox>,
+                                ) }
+                            </Form.Item>
+                            <Form.Item { ...tailFormItemLayout }>
+                                <Button type="primary" htmlType="submit">
+                                    Save
+                                </Button>
+                            </Form.Item>
+                        </Form>
+                    </Col>
+                </Row>
             </div>
         );
     }
 }
+
+
+const WrappedProductActivePage = Form.create()(ProductActivePage);
 
 const mapStateToProps = (state) => {
     return {
@@ -129,4 +202,4 @@ const mapDispatchToProps = (dispatch, props) => {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProductActivePage);
+export default connect(mapStateToProps, mapDispatchToProps)(WrappedProductActivePage);

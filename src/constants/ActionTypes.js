@@ -1,3 +1,4 @@
+export const UPDATE_NAV_STATE = 'UPDATE_NAV_STATE';
 export const FETCH_PRODUCT = 'FETCH_PRODUCT';
 export const ADD_PRODUCT = 'ADD_PRODUCT';
 export const UPDATE_PRODUCT = 'UPDATE_PRODUCT';

@@ -10,9 +10,9 @@ class App extends Component {
 			<Router>
 				<div>
 					<Menu />
-					<div className="container">
+					<div className="container margin-top-10">
 						<div className="row">
-							{this.showContentMenus(routes)}
+							{ this.showContentMenus(routes) }
 						</div>
 					</div>
 				</div>
@@ -25,13 +25,13 @@ class App extends Component {
 		result = routes.map((route, index) => {
 			return (
 				<Route
-					key={index}
-					path={route.path}
-					exact={route.exact}
-					component={route.main}
+					key={ index }
+					path={ route.path }
+					exact={ route.exact }
+					component={ route.main }
 				/>)
 		});
-		return <Switch>{result}</Switch>;
+		return <Switch>{ result }</Switch>;
 	}
 }
 
