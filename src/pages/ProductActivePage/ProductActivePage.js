@@ -9,7 +9,6 @@ class ProductActivePage extends Component {
     async componentDidMount() {
         const { match } = this.props;
         const id = match.params.id;
-        console.log('id :', id);
         if (id) {
             try {
                 const response = await actGetProductDetailRequest(id);
