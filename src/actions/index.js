@@ -74,23 +74,6 @@ export const actUpdateProduct = (product) => {
     }
 }
 
-export const actGetProductRequest = (id) => {
-    return dispatch => {
-        return CallAPI(`products/${id}`, 'GET', null).then((res) => {
-            if (res.status === 200) {
-                dispatch(actGetProduct(res.data));
-            }
-        })
-    }
-}
-
-export const actGetProductRequestNew = (id) => {
+export const actGetProductDetailRequest = (id) => {
     return CallAPI(`products/${id}`, 'GET', null);
-}
-
-export const actGetProduct = (product) => {
-    return {
-        type: Types.EDIT_PRODUCT,
-        product
-    }
 }

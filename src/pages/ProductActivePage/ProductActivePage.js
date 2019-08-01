@@ -1,99 +1,32 @@
 import React, { Component } from "react";
-import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { actAddProductRequest, actUpdateProductRequest, actGetProductRequest } from './../../actions/index';
-import { Form, Input, Button, Row, Col, Typography, Checkbox, InputNumber } from 'antd';
-
-import {actGetProductRequestNew} from '../../actions'
-
-const { Title } = Typography;
-
-
-
+import { Link } from "react-router-dom";
+import { actAddProductRequest, actUpdateProductRequest, actGetProductDetailRequest } from './../../actions/index';
+import { Form, Input, Button, Row, Col, Checkbox, InputNumber, Card } from 'antd';
 
 class ProductActivePage extends Component {
-    // constructor (props) {
-    //     super(props);
-    //     this.state = {
-    //         id: '',
-    //         txtName: '',
-    //         txtPrice: '',
-    //         chkbStatus: false
-    //     }
-    // }
-
-
-
-    // componentWillReceiveProps(nextProps) {
-    //     console.log('nextProps :', nextProps);
-    //     if (nextProps && nextProps.itemEditing) {
-    //         var { itemEditing } = nextProps;
-    //         this.setState({
-    //             id: itemEditing.id,
-    //             txtName: itemEditing.name,
-    //             txtPrice: itemEditing.price,
-    //             chkbStatus: itemEditing.status
-    //         })
-    //     }
-    // }
 
     async componentDidMount() {
-        console.log('componentDidMount :');
         const { match } = this.props;
         const id = match.params.id;
+        console.log('id :', id);
         if (id) {
-            try{
-                const response = await actGetProductRequestNew(id);
+            try {
+                const response = await actGetProductDetailRequest(id);
                 const {
                     form: { setFieldsValue }
-                  } = this.props;
-                    setFieldsValue({
-                        txtName: response.data.name,
-                        txtPrice: response.data.price,
-                        chkbStatus: response.data.status
-                    });
-                  
-            }catch(e){
+                } = this.props;
+                setFieldsValue({
+                    txtName: response.data.name,
+                    txtPrice: response.data.price,
+                    chkbStatus: response.data.status
+                });
+
+            } catch (e) {
                 console.log(e)
             }
-            // this.props.editProduct(id);
         }
     }
-
-    // componentDidUpdate(prevProps) {
-    //     console.log('componentDidUpdate :');
-    //     console.log('prevProps :', prevProps);
-    //     console.log('form :', this.props);
-    // }
-
-    // onChange = (e) => {
-    //     var target = e.target;
-    //     var name = target.name;
-    //     var value = target.type === 'checkbox' ? target.checked : target.value;
-    //     console.log('value :', value);
-    //     this.setState({
-    //         [ name ]: value
-    //     })
-    // }
-
-    // onSave = (e) => {
-    //     e.preventDefault();
-    //     var { id, txtName, txtPrice, chkbStatus } = this.state;
-    //     var { history } = this.props;
-    //     var product = {
-    //         id: id,
-    //         name: txtName,
-    //         price: txtPrice,
-    //         status: chkbStatus
-    //     }
-    //     if (id) {
-    //         this.props.updateProduct(product);
-    //         history.goBack();
-    //     } else {
-    //         this.props.addProduct(product);
-    //         history.goBack();
-    //     }
-    // }
 
     // state = {
     //     confirmDirty: false,
@@ -112,7 +45,7 @@ class ProductActivePage extends Component {
                     price: values.txtPrice,
                     status: values.chkbStatus
                 }
-                
+
                 if (id) {
                     this.props.updateProduct(product);
                     this.props.history.push('/product-list');
@@ -141,6 +74,7 @@ class ProductActivePage extends Component {
 
     render() {
         const { getFieldDecorator } = this.props.form;
+        const { match } = this.props;
         const formItemLayout = {
             labelCol: {
                 xs: { span: 24 },
@@ -168,44 +102,44 @@ class ProductActivePage extends Component {
             <div>
                 <Row type="flex" justify="center">
                     <Col span={ 12 }>
-                        <Title>Add Product</Title>
-                        <Form layout="horizontal" onSubmit={ this.handleSubmit } { ...formItemLayout } >
-                            <Form.Item label="Product Name">
-                                { getFieldDecorator('txtName', {
-                                    rules: [
-                                        {
-                                            required: true,
-                                            message: 'Please input product name!',
-                                        },
-                                    ],
-                                })(<Input />) }
-                            </Form.Item>
-                            <Form.Item label="Product Price">
-                                { getFieldDecorator('txtPrice', {
-                                    rules: [
-                                        {
-                                            required: true,
-                                            message: 'Please input product price!'
-                                        },
-                                        // {
-                                        //     validator: this.validateToPrice,
-                                        // }
-                                    ],
-                                })(<InputNumber min={1} />) }
-                            </Form.Item>
-                            <Form.Item label="Status">
-                                { getFieldDecorator('chkbStatus', {
-                                    valuePropName: 'checked',
-                                })(
-                                    <Checkbox></Checkbox>,
-                                ) }
-                            </Form.Item>
-                            <Form.Item { ...tailFormItemLayout }>
-                                <Button type="primary" htmlType="submit">
-                                    Save
-                                </Button>
-                            </Form.Item>
-                        </Form>
+                        <Card title={ !match.params.id ? "Add Product" : "Edit Product" }>
+                            <Form layout="horizontal" onSubmit={ this.handleSubmit } { ...formItemLayout } >
+                                <Form.Item label="Product Name" >
+                                    { getFieldDecorator('txtName', {
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: 'Please input product name!',
+                                            },
+                                        ],
+                                    })(<Input />) }
+                                </Form.Item>
+                                <Form.Item label="Product Price" >
+                                    { getFieldDecorator('txtPrice', {
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: 'Please input product price!'
+                                            },
+                                            // {
+                                            //     validator: this.validateToPrice,
+                                            // }
+                                        ],
+                                    })(<InputNumber min={ 1 } className="input-number-size" />) }
+                                </Form.Item>
+                                <Form.Item label="Status">
+                                    { getFieldDecorator('chkbStatus', {
+                                        valuePropName: 'checked',
+                                    })(
+                                        <Checkbox></Checkbox>,
+                                    ) }
+                                </Form.Item>
+                                <Form.Item { ...tailFormItemLayout }>
+                                    <Button type="danger" className="margin-right-10"><Link to="/product-list">Go Back</Link></Button>
+                                    <Button type="primary" htmlType="submit">Save</Button>
+                                </Form.Item>
+                            </Form>
+                        </Card>
                     </Col>
                 </Row>
             </div>
@@ -218,7 +152,7 @@ const WrappedProductActivePage = Form.create()(ProductActivePage);
 
 const mapStateToProps = (state) => {
     return {
-        itemEditing: state.itemEditing
+
     }
 }
 
@@ -229,9 +163,6 @@ const mapDispatchToProps = (dispatch, props) => {
         },
         updateProduct: (product) => {
             dispatch(actUpdateProductRequest(product));
-        },
-        editProduct: (id) => {
-            dispatch(actGetProductRequest(id));
         }
     }
 }
