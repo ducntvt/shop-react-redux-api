@@ -84,6 +84,10 @@ export const actGetProductRequest = (id) => {
     }
 }
 
+export const actGetProductRequestNew = (id) => {
+    return CallAPI(`products/${id}`, 'GET', null);
+}
+
 export const actGetProduct = (product) => {
     return {
         type: Types.EDIT_PRODUCT,

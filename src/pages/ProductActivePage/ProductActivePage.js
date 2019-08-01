@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { actAddProductRequest, actUpdateProductRequest, actGetProductRequest } from './../../actions/index';
 import { Form, Input, Button, Row, Col, Typography, Checkbox, InputNumber } from 'antd';
+
+import {actGetProductRequestNew} from '../../actions'
+
 const { Title } = Typography;
 
 
@@ -34,76 +37,107 @@ class ProductActivePage extends Component {
     //     }
     // }
 
-    componentDidMount() {
+    async componentDidMount() {
         console.log('componentDidMount :');
-        var { match } = this.props;
-        if (match) {
-            var id = match.params.id;
-            this.props.editProduct(id);
-        }
-    }
-
-    componentDidUpdate(prevProps) {
-        console.log('componentDidUpdate :');
-        console.log('prevProps :', prevProps);
-        console.log('form :', this.props);
-    }
-
-    onChange = (e) => {
-        var target = e.target;
-        var name = target.name;
-        var value = target.type === 'checkbox' ? target.checked : target.value;
-        console.log('value :', value);
-        this.setState({
-            [ name ]: value
-        })
-    }
-
-    onSave = (e) => {
-        e.preventDefault();
-        var { id, txtName, txtPrice, chkbStatus } = this.state;
-        var { history } = this.props;
-        var product = {
-            id: id,
-            name: txtName,
-            price: txtPrice,
-            status: chkbStatus
-        }
+        const { match } = this.props;
+        const id = match.params.id;
         if (id) {
-            this.props.updateProduct(product);
-            history.goBack();
-        } else {
-            this.props.addProduct(product);
-            history.goBack();
+            try{
+                const response = await actGetProductRequestNew(id);
+                const {
+                    form: { setFieldsValue }
+                  } = this.props;
+                    setFieldsValue({
+                        txtName: response.data.name,
+                        txtPrice: response.data.price,
+                        chkbStatus: response.data.status
+                    });
+                  
+            }catch(e){
+                console.log(e)
+            }
+            // this.props.editProduct(id);
         }
     }
 
-    state = {
-        confirmDirty: false,
-    };
+    // componentDidUpdate(prevProps) {
+    //     console.log('componentDidUpdate :');
+    //     console.log('prevProps :', prevProps);
+    //     console.log('form :', this.props);
+    // }
+
+    // onChange = (e) => {
+    //     var target = e.target;
+    //     var name = target.name;
+    //     var value = target.type === 'checkbox' ? target.checked : target.value;
+    //     console.log('value :', value);
+    //     this.setState({
+    //         [ name ]: value
+    //     })
+    // }
+
+    // onSave = (e) => {
+    //     e.preventDefault();
+    //     var { id, txtName, txtPrice, chkbStatus } = this.state;
+    //     var { history } = this.props;
+    //     var product = {
+    //         id: id,
+    //         name: txtName,
+    //         price: txtPrice,
+    //         status: chkbStatus
+    //     }
+    //     if (id) {
+    //         this.props.updateProduct(product);
+    //         history.goBack();
+    //     } else {
+    //         this.props.addProduct(product);
+    //         history.goBack();
+    //     }
+    // }
+
+    // state = {
+    //     confirmDirty: false,
+    // };
 
     handleSubmit = e => {
         e.preventDefault();
         this.props.form.validateFieldsAndScroll((err, values) => {
             if (!err) {
                 console.log('Received values of form: ', values);
+                const { match } = this.props;
+                const id = match.params.id;
+                const product = {
+                    id: id,
+                    name: values.txtName,
+                    price: values.txtPrice,
+                    status: values.chkbStatus
+                }
+                
+                if (id) {
+                    this.props.updateProduct(product);
+                    this.props.history.push('/product-list');
+                } else {
+                    this.props.addProduct(product);
+                    this.props.history.push('/product-list');
+                }
+
             }
         });
     };
 
-    handleConfirmBlur = e => {
-        const { value } = e.target;
-        this.setState({ confirmDirty: this.state.confirmDirty || !!value });
-    };
+    // handleConfirmBlur = e => {
+    //     const { value } = e.target;
+    //     this.setState({ confirmDirty: this.state.confirmDirty || !!value });
+    // };
 
-    validateToPrice = (rule, value, callback) => {
-        var reg = /^\d+$/;
-        if (reg.test(value) && value <= 0) {
-            callback('Product price is must number and greater than zero!');
-        } else {
-            callback();
-        }
-    };
+    // validateToPrice = (rule, value, callback) => {
+    //     var reg = /^\d+$/;
+    //     if (reg.test(value) && value <= 0) {
+    //         callback('Product price is must number and greater than zero!');
+    //     } else {
+    //         callback();
+    //     }
+    // };
 
     render() {
         const { getFieldDecorator } = this.props.form;
@@ -153,11 +187,11 @@ class ProductActivePage extends Component {
                                             required: true,
                                             message: 'Please input product price!'
                                         },
-                                        {
-                                            validator: this.validateToPrice,
-                                        }
+                                        // {
+                                        //     validator: this.validateToPrice,
+                                        // }
                                     ],
-                                })(<InputNumber />) }
+                                })(<InputNumber min={1} />) }
                             </Form.Item>
                             <Form.Item label="Status">
                                 { getFieldDecorator('chkbStatus', {
